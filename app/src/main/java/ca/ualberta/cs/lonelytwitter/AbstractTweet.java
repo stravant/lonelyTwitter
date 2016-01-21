@@ -27,6 +27,11 @@ public abstract class AbstractTweet {
         return message;
     }
 
+    @Override
+    public String toString() {
+        return date.toString() + " | " + message;
+    }
+
     public Date getDate() {
         return date;
     }
