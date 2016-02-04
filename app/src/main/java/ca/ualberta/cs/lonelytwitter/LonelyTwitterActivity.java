@@ -16,6 +16,7 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,15 +31,64 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * Main activity for LonelyTwitter
+ *
+ * @author Mark Langen
+ */
 public class LonelyTwitterActivity extends Activity {
-
+    /**
+     * The File to which the tweets are saved on the local file system.
+     */
     private static final String FILENAME = "file.sav";
+
+    /**
+     * The UI component into which the user can enter text to tweet
+     */
     private EditText bodyText;
+
+    /**
+     * The main UI component storing the list of tweets
+     */
     private ListView oldTweetsList;
 
+    /**
+     * The list of tweets currently being shown in the app
+     */
     private ArrayList<AbstractTweet> tweets = new ArrayList<AbstractTweet>();
+
+    /**
+     * Adapter to create tweet UI entries in the oldTweetsList
+     */
     ArrayAdapter<AbstractTweet> adapter;
 
+    private int calculateTweetSize() {
+        //
+        return -1;
+    }
+
+    public String removeStopWords() {
+        // Do something
+        return "";
+    }
+
+    private void startSecondActivity(Intent intent) {
+        // Run the second activity
+    }
+
+    protected boolean evaluateOtherActivity(Intent intent) {
+        // Do something
+        String expression1 = "", expression2 = "", expression3 = "",
+                expression4 = "";
+        //String expression = someMethod(expression1 + expression2 + expression3 +
+        //        expression4);
+        return true;
+    }
+
+    /**
+     * The adapter class specific to AbstractTweets to draw them into
+     * tweet list_items.
+     */
     private class TweetAdapter extends ArrayAdapter<AbstractTweet> {
         public TweetAdapter(Context context, ArrayList<AbstractTweet> tweets) {
             super(context, 0, tweets);
@@ -60,16 +110,20 @@ public class LonelyTwitterActivity extends Activity {
 
     /**
      * Called when the activity is first created.
+     *
+     * @param savedInstanceState Todo
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        // Find relevant parts in the UI
         bodyText = (EditText) findViewById(R.id.body);
         Button saveButton = (Button) findViewById(R.id.save);
         oldTweetsList = (ListView) findViewById(R.id.oldTweetsList);
 
+        // Set up save button
         saveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 setResult(RESULT_OK);
@@ -81,6 +135,7 @@ public class LonelyTwitterActivity extends Activity {
             }
         });
 
+        // Set up clear button
         Button clearButton = (Button)findViewById(R.id.clear);
         clearButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -91,14 +146,25 @@ public class LonelyTwitterActivity extends Activity {
         });
     }
 
+    /**
+     * Called when the activity is shown to the user
+     */
     @Override
     protected void onStart() {
         super.onStart();
+
+        // Load in tweets
         loadFromFile();
+
+        // Set up adapter to show them
         adapter = new TweetAdapter(this, tweets);
         oldTweetsList.setAdapter(adapter);
     }
 
+    /**
+     * Loads in the tweets from the FILENAME save file, destructively overwriting
+     * the contents of the tweets array.
+     */
     private void loadFromFile() {
         try {
             FileInputStream fis = openFileInput(FILENAME);
@@ -115,6 +181,11 @@ public class LonelyTwitterActivity extends Activity {
         }
     }
 
+    /**
+     * Saves the contents of the tweets array to the FILENAME save file.
+     * Runs synchronously, does not return until the contents have been commited
+     * to the file.
+     */
     private void saveInFile() {
         try {
             FileOutputStream fos = openFileOutput(FILENAME,
