@@ -29,7 +29,14 @@ public class IntentReaderActivity extends Activity {
 
         //
         //
+        Intent intent = getIntent();
+        mode = intent.getIntExtra(MODE_OF_TRANSFORM_KEY, NORMAL);
+        text = intent.getStringExtra(TEXT_TO_TRANSFORM_KEY);
+        if (text == null)
+            text = "Default Value";
+        text = transformText(text);
 
+        ((TextView)findViewById(R.id.intentText)).setText(text);
         //
         //
     }
