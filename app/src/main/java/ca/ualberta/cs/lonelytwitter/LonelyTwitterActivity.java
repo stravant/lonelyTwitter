@@ -21,6 +21,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class LonelyTwitterActivity extends Activity {
 
@@ -53,11 +55,28 @@ public class LonelyTwitterActivity extends Activity {
                 String text = bodyText.getText().toString();
                 Tweet latestTweet = new NormalTweet(text);
 
-                tweets.add(latestTweet);
-                adapter.notifyDataSetChanged();
+                ElasticsearchTweetController.GetTweetsTask task =
+                        new ElasticsearchTweetController.GetTweetsTask();
+                task.execute(text);
+                try {
+                    tweets.clear();
+                    tweets.addAll(task.get());
+                    adapter.notifyDataSetChanged();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+//                tweets.add(latestTweet);
+//                adapter.notifyDataSetChanged();
+//
+//                ElasticsearchTweetController.AddTweetTask task =
+//                        new ElasticsearchTweetController.AddTweetTask();
+//                task.execute(latestTweet);
 
                 // TODO: Replace with Elasticsearch
-                saveInFile();
+                //saveInFile();
 
                 setResult(RESULT_OK);
             }
@@ -70,7 +89,17 @@ public class LonelyTwitterActivity extends Activity {
 
         // Get latest tweets
         // TODO: Replace with Elasticsearch
-        loadFromFile();
+        ElasticsearchTweetController.GetTweetsTask task =
+                new ElasticsearchTweetController.GetTweetsTask();
+        task.execute("test");
+        tweets = new ArrayList<Tweet>();
+        try {
+            tweets.addAll(task.get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
         // Binds tweet list with view, so when our array updates, the view updates with it
         adapter = new ArrayAdapter<Tweet>(this, R.layout.list_item, tweets);
